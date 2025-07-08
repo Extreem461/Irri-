@@ -19,7 +19,7 @@
 1. Перейдите в раздел “Интеграции”
 1. Нажмите на три точки в правом верхнем углу
 1. Выберите “Пользовательские репозитории”
-1. Добавьте URL: `https://github.com/yourusername/lawn-irrigation-hacs`
+1. Добавьте URL: `https://github.com/Extreem461/Irri-`
 1. Категория: “Integration”
 1. Нажмите “Добавить”
 1. Найдите “Lawn Irrigation System” и установите
