@@ -90,38 +90,45 @@ async def _async_register_services(hass: HomeAssistant, coordinator: LawnIrrigat
 “”“Register services for the integration.”””
 
 ```
-async def start_irrigation(call: ServiceCall) -> None:
-    """Start irrigation for all zones."""
-    duration = call.data.get(ATTR_DURATION, DEFAULT_DURATION)
-    await coordinator.async_start_irrigation(duration)
+# Only register services if not already registered
+if not hass.services.has_service(DOMAIN, SERVICE_START_IRRIGATION):
+    async def start_irrigation(call: ServiceCall) -> None:
+        """Start irrigation for all zones."""
+        duration = call.data.get(ATTR_DURATION, DEFAULT_DURATION)
+        await coordinator.async_start_irrigation(duration)
+    
+    hass.services.async_register(
+        DOMAIN, SERVICE_START_IRRIGATION, start_irrigation, SERVICE_START_IRRIGATION_SCHEMA
+    )
 
-async def stop_irrigation(call: ServiceCall) -> None:
-    """Stop all irrigation."""
-    await coordinator.async_stop_irrigation()
+if not hass.services.has_service(DOMAIN, SERVICE_STOP_IRRIGATION):
+    async def stop_irrigation(call: ServiceCall) -> None:
+        """Stop all irrigation."""
+        await coordinator.async_stop_irrigation()
+    
+    hass.services.async_register(
+        DOMAIN, SERVICE_STOP_IRRIGATION, stop_irrigation
+    )
 
-async def run_zone(call: ServiceCall) -> None:
-    """Run specific zone."""
-    zone_id = call.data[ATTR_ZONE_ID]
-    duration = call.data.get(ATTR_DURATION, DEFAULT_DURATION)
-    await coordinator.async_run_zone(zone_id, duration)
+if not hass.services.has_service(DOMAIN, SERVICE_RUN_ZONE):
+    async def run_zone(call: ServiceCall) -> None:
+        """Run specific zone."""
+        zone_id = call.data[ATTR_ZONE_ID]
+        duration = call.data.get(ATTR_DURATION, DEFAULT_DURATION)
+        await coordinator.async_run_zone(zone_id, duration)
+    
+    hass.services.async_register(
+        DOMAIN, SERVICE_RUN_ZONE, run_zone, SERVICE_RUN_ZONE_SCHEMA
+    )
 
-async def run_program(call: ServiceCall) -> None:
-    """Run irrigation program."""
-    program_name = call.data[ATTR_PROGRAM_NAME]
-    zones = call.data.get(ATTR_ZONES, [])
-    await coordinator.async_run_program(program_name, zones)
-
-# Register services
-hass.services.async_register(
-    DOMAIN, SERVICE_START_IRRIGATION, start_irrigation, SERVICE_START_IRRIGATION_SCHEMA
-)
-hass.services.async_register(
-    DOMAIN, SERVICE_STOP_IRRIGATION, stop_irrigation
-)
-hass.services.async_register(
-    DOMAIN, SERVICE_RUN_ZONE, run_zone, SERVICE_RUN_ZONE_SCHEMA
-)
-hass.services.async_register(
-    DOMAIN, SERVICE_RUN_PROGRAM, run_program, SERVICE_RUN_PROGRAM_SCHEMA
-)
+if not hass.services.has_service(DOMAIN, SERVICE_RUN_PROGRAM):
+    async def run_program(call: ServiceCall) -> None:
+        """Run irrigation program."""
+        program_name = call.data[ATTR_PROGRAM_NAME]
+        zones = call.data.get(ATTR_ZONES, [])
+        await coordinator.async_run_program(program_name, zones)
+    
+    hass.services.async_register(
+        DOMAIN, SERVICE_RUN_PROGRAM, run_program, SERVICE_RUN_PROGRAM_SCHEMA
+    )
 ```
