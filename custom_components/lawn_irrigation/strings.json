@@ -1,0 +1,43 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Lawn Irrigation System",
+        "description": "Set up your lawn irrigation system",
+        "data": {
+          "system_name": "System Name"
+        }
+      },
+      "zone": {
+        "title": "Configure Zones",
+        "description": "Add irrigation zones to your system. Current zones: {zones_count}\\nConfigured zones: {zones_list}",
+        "data": {
+          "zone_name": "Zone Name",
+          "zone_entity": "Zone Switch Entity",
+          "zone_duration": "Default Duration (minutes)",
+          "add_zone": "Add Zone",
+          "finish": "Finish Configuration"
+        }
+      }
+    },
+    "error": {
+      "zone_name": "Zone name is required",
+      "zone_entity": "Zone entity is required",
+      "entity_not_found": "Entity not found",
+      "base": "At least one zone is required"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Lawn Irrigation Options",
+        "description": "Configure additional options for your irrigation system",
+        "data": {
+          "default_duration": "Default Duration (minutes)",
+          "enable_weather_check": "Enable Weather Check",
+          "rain_sensor_entity": "Rain Sensor Entity"
+        }
+      }
+    }
+  }
+}
