@@ -1,0 +1,58 @@
+start_irrigation:
+  name: Start Irrigation
+  description: Start irrigation for all zones
+  fields:
+    duration:
+      name: Duration
+      description: Duration in minutes (optional, uses zone defaults if not specified)
+      example: 15
+      selector:
+        number:
+          min: 1
+          max: 120
+          unit_of_measurement: min
+
+stop_irrigation:
+  name: Stop Irrigation
+  description: Stop all irrigation zones immediately
+
+run_zone:
+  name: Run Zone
+  description: Run a specific irrigation zone
+  fields:
+    zone_id:
+      name: Zone ID
+      description: Name of the zone to run
+      required: true
+      example: "Front Lawn"
+      selector:
+        text:
+    duration:
+      name: Duration
+      description: Duration in minutes (optional, uses zone default if not specified)
+      example: 10
+      selector:
+        number:
+          min: 1
+          max: 120
+          unit_of_measurement: min
+
+run_program:
+  name: Run Program
+  description: Run a custom irrigation program
+  fields:
+    program_name:
+      name: Program Name
+      description: Name of the program to run
+      required: true
+      example: "Morning Watering"
+      selector:
+        text:
+    zones:
+      name: Zones
+      description: List of zones to include in the program (optional, uses all zones if not specified)
+      example: ["Front Lawn", "Back Lawn"]
+      selector:
+        select:
+          options: []
+          multiple: true
