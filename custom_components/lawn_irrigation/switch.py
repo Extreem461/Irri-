@@ -155,5 +155,12 @@ async def async_turn_off(self, **kwargs: Any) -> None:
     
     # Turn off the underlying switch
     await self.hass.services.async_call(
-        "switch", "turn_off", {"entity
+        "switch", "turn_off", {"entity_id": self._zone_entity}
+    )
+    
+    # Remove from active zones
+    if self._zone_entity in self.coordinator.active_zones:
+        self.coordinator.active_zones.remove(self._zone_entity)
+    
+    await self.coordinator.async_update_listeners()
 ```
