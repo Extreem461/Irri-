@@ -21,20 +21,27 @@ def __init__(self):
     """Initialize the config flow."""
     self.zones = []
 
-async def async_step_user(self, user_input=None):
+async def async_step_user(self, user_input=None) -> FlowResult:
     """Handle the initial step."""
-    if user_input is None:
-        return self.async_show_form(
-            step_id="user",
-            data_schema=vol.Schema({
-                vol.Required("system_name", default="Lawn Irrigation"): str,
-            })
-        )
+    errors = {}
+    
+    if user_input is not None:
+        # Check if integration is already configured
+        await self.async_set_unique_id(DOMAIN)
+        self._abort_if_unique_id_configured()
+        
+        self.system_name = user_input["system_name"]
+        return await self.async_step_zone()
 
-    self.system_name = user_input["system_name"]
-    return await self.async_step_zone()
+    return self.async_show_form(
+        step_id="user",
+        data_schema=vol.Schema({
+            vol.Required("system_name", default="Lawn Irrigation"): str,
+        }),
+        errors=errors
+    )
 
-async def async_step_zone(self, user_input=None):
+async def async_step_zone(self, user_input=None) -> FlowResult:
     """Handle zone configuration."""
     errors = {}
     
@@ -48,41 +55,38 @@ async def async_step_zone(self, user_input=None):
                 errors["zone_name"] = "Zone name is required"
             elif not zone_entity:
                 errors["zone_entity"] = "Zone entity is required"
+            elif zone_entity not in self.hass.states.async_entity_ids():
+                errors["zone_entity"] = "Entity not found"
             else:
-                # Check if entity exists
-                if zone_entity not in self.hass.states.async_entity_ids():
-                    errors["zone_entity"] = "Entity not found"
-                else:
-                    self.zones.append({
-                        CONF_ZONE_NAME: zone_name,
-                        CONF_ZONE_ENTITY: zone_entity,
-                        CONF_ZONE_DURATION: zone_duration
-                    })
-                    
-                    # Clear form for next zone
-                    user_input = {
-                        "zone_name": "",
-                        "zone_entity": "",
-                        "zone_duration": 10,
-                        "add_zone": False
-                    }
+                self.zones.append({
+                    CONF_ZONE_NAME: zone_name,
+                    CONF_ZONE_ENTITY: zone_entity,
+                    CONF_ZONE_DURATION: zone_duration
+                })
+                
+                # Reset form for next zone
+                user_input = None
         
-        elif user_input.get("finish") and self.zones:
-            return self.async_create_entry(
-                title=self.system_name,
-                data={
-                    "system_name": self.system_name,
-                    CONF_ZONES: self.zones
-                }
-            )
-        elif user_input.get("finish") and not self.zones:
-            errors["base"] = "At least one zone is required"
+        elif user_input.get("finish"):
+            if not self.zones:
+                errors["base"] = "At least one zone is required"
+            else:
+                return self.async_create_entry(
+                    title=self.system_name,
+                    data={
+                        "system_name": self.system_name,
+                        CONF_ZONES: self.zones
+                    }
+                )
 
     # Get available switch entities
     switch_entities = [
         entity_id for entity_id in self.hass.states.async_entity_ids()
         if entity_id.startswith("switch.")
     ]
+    
+    if not switch_entities:
+        switch_entities = ["switch.example"]  # Fallback
 
     data_schema = vol.Schema({
         vol.Optional("zone_name", default=""): str,
@@ -97,8 +101,8 @@ async def async_step_zone(self, user_input=None):
         data_schema=data_schema,
         errors=errors,
         description_placeholders={
-            "zones_count": len(self.zones),
-            "zones_list": ", ".join([zone[CONF_ZONE_NAME] for zone in self.zones])
+            "zones_count": str(len(self.zones)),
+            "zones_list": ", ".join([zone[CONF_ZONE_NAME] for zone in self.zones]) if self.zones else "None"
         }
     )
 
@@ -117,7 +121,7 @@ def __init__(self, config_entry):
     """Initialize options flow."""
     self.config_entry = config_entry
 
-async def async_step_init(self, user_input=None):
+async def async_step_init(self, user_input=None) -> FlowResult:
     """Handle options flow."""
     if user_input is not None:
         return self.async_create_entry(title="", data=user_input)
@@ -139,3 +143,4 @@ async def async_step_init(self, user_input=None):
             ): str,
         })
     )
+```
