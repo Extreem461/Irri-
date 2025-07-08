@@ -1,0 +1,7 @@
+{
+  "name": "Lawn Irrigation System",
+  "hacs": "1.6.0",
+  "domains": ["switch", "sensor"],
+  "iot_class": "local_polling",
+  "homeassistant": "2024.1.0"
+}
